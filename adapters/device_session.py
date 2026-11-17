@@ -115,15 +115,41 @@ def _try_start_frida_server(serial: str) -> bool:
     return _frida_server_running(serial)
 
 
+def _remote_device_ok(frida_host: str) -> tuple[bool, str]:
+    """원격 frida-server(-H) 접속 가능 여부. (ok, detail)."""
+    try:
+        import frida
+    except ImportError:
+        return False, "frida 미설치 (setup-dynamic.sh)"
+    try:
+        dev = frida.get_device_manager().add_remote_device(frida_host)
+        _ = dev.enumerate_processes()  # 실제 통신 확인
+        return True, "원격 frida-server 접속 OK"
+    except Exception as e:  # noqa: BLE001
+        return False, f"원격 {frida_host} 접속 실패: {e}"
+
+
 def check(platform: str = "android", package: str = "", auto_recover: bool = True) -> DeviceStatus:
     """세션 상태 점검 (§7). 디바이스 없으면 no_device 로 즉시 구조화 반환."""
     prof = _profiles()
     pconf = prof.get(platform, {})
     target = pconf.get("target", "") or ""
+    frida_host = pconf.get("host", "") or ""
     want_ver = str(prof.get("frida", {}).get("version", ""))
     host_ver = host_frida_version()
 
-    # 1) 기기 연결
+    # 원격 iOS 경로 (WSL2에서 USB 안 보일 때): host 로 네트워크 접속
+    if frida_host:
+        ok, detail = _remote_device_ok(frida_host)
+        if not ok:
+            return DeviceStatus(SessionState.no_device, platform, frida_host, detail=detail,
+                                host_frida_version=host_ver, abi=pconf.get("arch", ""))
+        return DeviceStatus(SessionState.ready, platform, frida_host,
+                            detail=f"원격 frida 준비 완료 ({detail})",
+                            host_frida_version=host_ver, device_frida_version=want_ver,
+                            abi=pconf.get("arch", ""))
+
+    # 1) 기기 연결 (USB/로컬 경로)
     ids = _ls_devices_ids()
     if not target:
         return DeviceStatus(SessionState.no_device, platform, target,

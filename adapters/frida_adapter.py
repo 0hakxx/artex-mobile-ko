@@ -12,12 +12,19 @@ from typing import Any
 from schema.config import REPO_ROOT
 
 
+def _get_device(frida, device_id: str, host: str = ""):
+    """기기 핸들 획득. host 가 있으면 원격 frida-server(-H), 없으면 id 로 USB(-U 금지)."""
+    if host:
+        # WSL2에서 USB 가 안 보일 때: 네트워크로 기기 frida-server 접속
+        return frida.get_device_manager().add_remote_device(host)
+    return frida.get_device(device_id, timeout=10)
+
+
 def run_script(device_id: str, package: str, script_path: str | Path,
-               spawn: bool = True, collect_sec: int = 6) -> dict[str, Any]:
-    """device_id 기기에서 package 를 띄우고 script 를 로드, send() 메시지 수집.
+               spawn: bool = True, collect_sec: int = 6, host: str = "") -> dict[str, Any]:
+    """device_id 기기(또는 원격 host)에서 package 를 띄우고 script 로드, send() 수집.
 
     반환: {"ok": bool, "messages": [...], "error": str}
-    messages 는 스크립트가 send() 한 _artex 레코드 리스트.
     """
     try:
         import frida  # noqa: F401
@@ -43,10 +50,10 @@ def run_script(device_id: str, package: str, script_path: str | Path,
                              "title": "Frida 스크립트 오류", "evidence": message.get("description", "")})
 
     try:
-        # device id 로 정확히 타겟팅 (-U 금지)
-        device = frida.get_device(device_id, timeout=10)
+        device = _get_device(frida, device_id, host=host)
     except Exception as e:  # noqa: BLE001
-        return {"ok": False, "error": f"기기 '{device_id}' 접근 실패: {e}", "messages": []}
+        where = f"원격 {host}" if host else f"기기 '{device_id}'"
+        return {"ok": False, "error": f"{where} 접근 실패: {e}", "messages": []}
 
     session = None
     try:

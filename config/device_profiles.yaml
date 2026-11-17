@@ -11,6 +11,10 @@ android:
   bluestacks_host_port: "" # 예: "<windows-host-ip>:5555" (connect-android.sh 용)
 
 ios:
-  # 탈옥 실단말. UDID 로 타겟팅.
-  target: ""               # idevice_id 로 얻은 UDID
+  # 탈옥 실단말. UDID 로 타겟팅(USB/usbipd 경로) 또는 원격 frida 호스트.
+  target: ""               # USB 경로: idevice_id 로 얻은 UDID
   arch: "arm64"
+  # 원격 경로(WSL2에서 USB 안 보일 때): 기기 frida-server 를 네트워크로.
+  #   기기에서: frida-server -l 0.0.0.0:27042
+  #   또는 Windows 에서 iproxy 27042 27042 후 host= <windows-host-ip>:27042
+  host: ""                 # 예: "192.168.0.50:27042" (비우면 USB/UDID 사용)

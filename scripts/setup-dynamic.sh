@@ -21,6 +21,8 @@ fi
 source "${VENV}/bin/activate"
 
 pip install --quiet --upgrade pip
+# 파이프라인 런타임(스키마/설정 로더)도 동적 venv 에 필요.
+pip install --quiet pydantic PyYAML
 # frida 버전 고정 — 호스트/서버 불일치 방지(§2). frida-tools 는 호환 frida 끌어옴.
 pip install --quiet "frida==${FRIDA_VERSION}" "frida-tools" objection || \
   warn "frida/objection 설치 일부 실패 — 네트워크/빌드 의존성 확인."
