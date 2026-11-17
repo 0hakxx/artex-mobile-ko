@@ -26,8 +26,11 @@ def normalize(messages: list[dict[str, Any]], target: Target,
     out: list[Finding] = []
     for m in messages:
         check = m.get("check", "")
-        # 정보성(후킹 설치/환경)만 있는 메시지는 finding 아님
-        if check in ("hooks_installed", "env", "script_error", "ssl_hook_err"):
+        # 정보성·진단 메시지(후킹 설치/환경/오류)는 finding 아님
+        if check in ("hooks_installed", "env") or check.endswith("_err"):
+            continue
+        # mastg 없고 info 심각도 = 진단성 → 스킵 (실제 동적 finding 아님)
+        if not m.get("mastg") and m.get("severity", "info") == "info":
             continue
         mastg = [m["mastg"]] if m.get("mastg") else []
         masvs = [m["masvs"]] if m.get("masvs") else []

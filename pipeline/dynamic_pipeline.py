@@ -52,10 +52,14 @@ def run_dynamic(package: str, platform: str = "android",
                              error=status.detail)
 
     # 2) Frida 런타임 점검 (원격 host 가 설정돼 있으면 -H 경로)
+    # 세션이 원격 경로로 ready 면 status.target 이 host(ip:port). 아니면 USB.
+    import os
     import yaml as _yaml
-    from schema.config import REPO_ROOT as _ROOT
+    from schema.config import REPO_ROOT as _ROOT, _load_dotenv
+    _load_dotenv(_ROOT / ".env")
     _prof = _yaml.safe_load((_ROOT / "config" / "device_profiles.yaml").read_text()) or {}
-    frida_host = (_prof.get(platform, {}) or {}).get("host", "") or ""
+    frida_host = (os.environ.get(f"{platform.upper()}_FRIDA_HOST", "")
+                  or (_prof.get(platform, {}) or {}).get("host", "") or "")
     run = frida_adapter.run_script(status.target, package, script, spawn=spawn, host=frida_host)
     if not run["ok"]:
         return DynamicResult(ok=False, state="frida_run_failed", package=package,

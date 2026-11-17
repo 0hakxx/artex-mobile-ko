@@ -74,5 +74,6 @@ docker compose -f docker/docker-compose.yml run --rm tools \
   APK/IPA 분기, 교차 도구 dedup+confidence 병합, MASTG/전자금융 리포트, 웹 UI.
   - 실행: `docker compose -f docker/docker-compose.yml run --rm tools run_static.py <apk|ipa> --fresh --decompile`
 - [~] **Phase 2** — Android 동적(호스트 프로세스). adb 래퍼 + §7 세션 상태머신 + Frida 런타임 점검(SSL/루팅/암호/로그) + dynamic normalizer + 공유 store 적재. 디바이스 없이: 미연결→구조화 중단·정적↔동적 confidence 상승 검증. 실단말 라이브(SSL→Burp)는 기기 연결 후 `python run_dynamic.py <pkg>`.
-- [ ] Phase 3 — iOS 동적
-- [ ] Phase 4 — 리포트 자동화 / 패커(백로그)
+- [~] **Phase 3** — iOS 동적(맥 없이, 탈옥 실단말). 원격 frida(`-H`)로 WSL2↔기기 네트워크 접속, ObjC 런타임 후킹(탈옥탐지/SSL/NSUserDefaults). **실기기 라이브 검증 완료**: 세션 상태머신 ready(16.1.4 일치), 탈옥탐지 후킹→confirmed finding(MASTG-TEST-0063) store 적재. 앱 컨테이너 SSH 덤프·Burp 연동은 남음.
+  - 기기 IP 는 `.env` 의 `IOS_FRIDA_HOST` 로 주입(공개 레포에 미포함). 실행: `python run_dynamic.py <bundleid> --platform ios --script scripts/frida/ios_checks.js`
+- [ ] Phase 4 — 리포트 자동화(✅ 정적) / 패커 언패킹(백로그 R&D)

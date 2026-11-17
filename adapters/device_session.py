@@ -134,7 +134,12 @@ def check(platform: str = "android", package: str = "", auto_recover: bool = Tru
     prof = _profiles()
     pconf = prof.get(platform, {})
     target = pconf.get("target", "") or ""
-    frida_host = pconf.get("host", "") or ""
+    # 기기 IP 는 공개 레포에 안 올리도록 .env(IOS_FRIDA_HOST/ANDROID_FRIDA_HOST)로 덮어쓰기 우선
+    import os
+    from schema.config import _load_dotenv
+    _load_dotenv(REPO_ROOT / ".env")
+    env_host = os.environ.get(f"{platform.upper()}_FRIDA_HOST", "")
+    frida_host = env_host or pconf.get("host", "") or ""
     want_ver = str(prof.get("frida", {}).get("version", ""))
     host_ver = host_frida_version()
 
