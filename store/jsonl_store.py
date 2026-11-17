@@ -69,5 +69,28 @@ class FindingsStore:
             Path(tmp_name).unlink(missing_ok=True)
             raise
 
+    def promote_confidence(self, confirmed_mastg_ids: set[str]) -> int:
+        """동적으로 재현된 mastg_id 를 공유하는 정적 finding 의 confidence 를 confirmed 로 상승(§5).
+
+        같은 dedup_key 로 안 합쳐진(위치가 다른) 정적·동적 '같은 취약점'도
+        confidence 를 끌어올린다. raw.dynamically_confirmed 로 추적.
+        반환: 상승된 정적 finding 수.
+        """
+        from schema.findings import AnalysisType, Confidence
+        if not confirmed_mastg_ids:
+            return 0
+        rows = self.all()
+        n = 0
+        for f in rows:
+            if (f.analysis_type == AnalysisType.static
+                    and f.confidence != Confidence.confirmed
+                    and set(f.mastg_ids) & confirmed_mastg_ids):
+                f.confidence = Confidence.confirmed
+                f.raw["dynamically_confirmed"] = True
+                n += 1
+        if n:
+            self._rewrite(rows)
+        return n
+
     def clear(self) -> None:
         self.path.unlink(missing_ok=True)

@@ -73,6 +73,6 @@ docker compose -f docker/docker-compose.yml run --rm tools \
 - [x] **Phase 1** — 정적 파이프라인 완료. **MobSF·apkid·LIEF·semgrep(jadx 디컴파일)** 전부 라이브·self-contained.
   APK/IPA 분기, 교차 도구 dedup+confidence 병합, MASTG/전자금융 리포트, 웹 UI.
   - 실행: `docker compose -f docker/docker-compose.yml run --rm tools run_static.py <apk|ipa> --fresh --decompile`
-- [ ] Phase 2 — Android 동적
+- [~] **Phase 2** — Android 동적(호스트 프로세스). adb 래퍼 + §7 세션 상태머신 + Frida 런타임 점검(SSL/루팅/암호/로그) + dynamic normalizer + 공유 store 적재. 디바이스 없이: 미연결→구조화 중단·정적↔동적 confidence 상승 검증. 실단말 라이브(SSL→Burp)는 기기 연결 후 `python run_dynamic.py <pkg>`.
 - [ ] Phase 3 — iOS 동적
 - [ ] Phase 4 — 리포트 자동화 / 패커(백로그)
