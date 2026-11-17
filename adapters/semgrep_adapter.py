@@ -11,7 +11,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from schema.config import load_config
+from schema.config import REPO_ROOT, load_config
 
 
 def run_semgrep(src_dir: str | Path, config: str | None = None,
@@ -24,6 +24,10 @@ def run_semgrep(src_dir: str | Path, config: str | None = None,
         return {"error": f"소스 경로 없음: {src}"}
     cfg_yaml = load_config("tools").get("semgrep", {})
     config = config or cfg_yaml.get("config", "auto")
+    # 레포-상대 경로면 절대경로로(로컬 룰셋). 아니면 registry id 로 그대로 전달.
+    local = REPO_ROOT / config
+    if local.exists():
+        config = str(local)
     timeout = timeout or int(cfg_yaml.get("timeout_sec", 600))
     try:
         proc = subprocess.run(

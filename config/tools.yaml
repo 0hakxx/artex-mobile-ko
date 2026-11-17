@@ -9,8 +9,8 @@ mobsf:
   scan_poll_timeout_sec: 900
 
 semgrep:
-  # 모바일 룰셋 (registry 또는 로컬 경로)
-  config: "p/mobsf"
+  # 로컬 룰셋(self-contained·오프라인). registry id("p/mobsf") 로 바꾸면 네트워크 사용.
+  config: "mappings/semgrep-rules"
   timeout_sec: 600
 
 apkid:

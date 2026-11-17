@@ -1,0 +1,80 @@
+# Mobile ARTEX 로컬 semgrep 룰셋 (self-contained, 오프라인). jadx 디컴파일 Java 대상.
+# registry(p/mobsf) 의존 없이 결정적으로 동작. rule id 는 semgrep_mastg.yaml 로 MASTG 매핑.
+rules:
+  - id: weak-hash-md5-sha1
+    languages: [java]
+    severity: WARNING
+    message: "약한 해시 알고리즘(MD5/SHA-1) 사용 — 충돌 공격에 취약."
+    metadata: {masvs: "MASVS-CRYPTO-1"}
+    patterns:
+      - pattern-either:
+          - pattern: MessageDigest.getInstance("MD5")
+          - pattern: MessageDigest.getInstance("SHA-1")
+          - pattern: MessageDigest.getInstance("SHA1")
+
+  - id: weak-cipher-des-ecb
+    languages: [java]
+    severity: ERROR
+    message: "취약한 암호 구성(DES 또는 ECB 모드) 사용."
+    metadata: {masvs: "MASVS-CRYPTO-2"}
+    patterns:
+      - pattern-either:
+          - pattern: Cipher.getInstance("DES")
+          - pattern: Cipher.getInstance("=~/.*ECB.*/")
+          - pattern: Cipher.getInstance("=~/^DES.*/")
+
+  - id: insecure-random
+    languages: [java]
+    severity: WARNING
+    message: "보안 맥락에서 예측 가능한 java.util.Random 사용 — SecureRandom 권장."
+    metadata: {masvs: "MASVS-CRYPTO-1"}
+    patterns:
+      - pattern: new java.util.Random(...)
+
+  - id: webview-js-enabled
+    languages: [java]
+    severity: WARNING
+    message: "WebView JavaScript 활성화 — XSS/인터페이스 노출 위험 검토 필요."
+    metadata: {masvs: "MASVS-PLATFORM-2"}
+    patterns:
+      - pattern: $W.getSettings().setJavaScriptEnabled(true)
+
+  - id: world-accessible-prefs
+    languages: [java]
+    severity: ERROR
+    message: "MODE_WORLD_READABLE/WRITEABLE 저장 — 타 앱이 접근 가능."
+    metadata: {masvs: "MASVS-STORAGE-1"}
+    patterns:
+      - pattern-either:
+          - pattern: $C.getSharedPreferences($N, 1)
+          - pattern: $C.openFileOutput($N, 1)
+          - pattern: $C.openFileOutput($N, 2)
+
+  - id: sensitive-logging
+    languages: [java]
+    severity: WARNING
+    message: "로그 출력 — 민감정보 누출 가능성 검토."
+    metadata: {masvs: "MASVS-STORAGE-2"}
+    patterns:
+      - pattern-either:
+          - pattern: android.util.Log.d(...)
+          - pattern: android.util.Log.v(...)
+          - pattern: Log.d(...)
+
+  - id: trustmanager-bypass
+    languages: [java]
+    severity: ERROR
+    message: "인증서 검증을 무력화하는 TrustManager/HostnameVerifier 패턴."
+    metadata: {masvs: "MASVS-NETWORK-1"}
+    patterns:
+      - pattern-either:
+          - pattern: org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+          - pattern: $X.setHostnameVerifier(org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+
+  - id: external-storage-write
+    languages: [java]
+    severity: WARNING
+    message: "외부 저장소 경로 사용 — 민감정보 저장 시 노출 위험."
+    metadata: {masvs: "MASVS-STORAGE-2"}
+    patterns:
+      - pattern: android.os.Environment.getExternalStorageDirectory(...)

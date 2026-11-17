@@ -5,10 +5,17 @@ FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 
-# apkid(yara-python 빌드 대비) 최소 빌드 의존성
+# apkid(yara-python 빌드 대비) 최소 빌드 의존성 + jadx 실행용 JRE
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      git curl ca-certificates && \
+      git curl ca-certificates unzip default-jre-headless && \
     rm -rf /var/lib/apt/lists/*
+
+# jadx (APK 디컴파일 → semgrep 입력). self-contained 하게 컨테이너에 포함.
+ARG JADX_VERSION=1.5.0
+RUN curl -fsSL -o /tmp/jadx.zip \
+      "https://github.com/skylot/jadx/releases/download/v${JADX_VERSION}/jadx-${JADX_VERSION}.zip" && \
+    mkdir -p /opt/jadx && unzip -q /tmp/jadx.zip -d /opt/jadx && rm /tmp/jadx.zip && \
+    ln -s /opt/jadx/bin/jadx /usr/local/bin/jadx
 
 # 파이프라인 런타임 + 정적 보강 도구. 버전 고정으로 재현성 확보.
 RUN pip install \

@@ -1,0 +1,36 @@
+# semgrep rule id(짧은 형태) → MASTG/MASVS 매핑 (§5). loader.lookup(tool="semgrep").
+# 로컬 룰셋(android-security.yaml)의 rule id 기준. 미등록은 metadata.masvs 폴백.
+version: 1
+rules:
+  weak-hash-md5-sha1:
+    mastg_ids: ["MASTG-TEST-0203"]
+    masvs_ids: ["MASVS-CRYPTO-1"]
+    category: "MASVS-CRYPTO"
+  weak-cipher-des-ecb:
+    mastg_ids: ["MASTG-TEST-0221"]
+    masvs_ids: ["MASVS-CRYPTO-2"]
+    category: "MASVS-CRYPTO"
+  insecure-random:
+    mastg_ids: ["MASTG-TEST-0204"]
+    masvs_ids: ["MASVS-CRYPTO-1"]
+    category: "MASVS-CRYPTO"
+  webview-js-enabled:
+    mastg_ids: ["MASTG-TEST-0033"]
+    masvs_ids: ["MASVS-PLATFORM-2"]
+    category: "MASVS-PLATFORM"
+  world-accessible-prefs:
+    mastg_ids: ["MASTG-TEST-0001"]
+    masvs_ids: ["MASVS-STORAGE-1"]
+    category: "MASVS-STORAGE"
+  sensitive-logging:
+    mastg_ids: ["MASTG-TEST-0003"]
+    masvs_ids: ["MASVS-STORAGE-2"]
+    category: "MASVS-STORAGE"
+  trustmanager-bypass:
+    mastg_ids: ["MASTG-TEST-0019"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+  external-storage-write:
+    mastg_ids: ["MASTG-TEST-0004"]
+    masvs_ids: ["MASVS-STORAGE-2"]
+    category: "MASVS-STORAGE"

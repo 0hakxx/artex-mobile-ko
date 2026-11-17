@@ -39,7 +39,8 @@ def _run_job(job_id: str, apk_path: Path):
         job["status"] = "running"
         job["stage"] = "정적 분석(MobSF/apkid/LIEF) 실행 중..."
         store = FindingsStore(JOBS_DIR / job_id / "findings.jsonl")
-        res = run_static(apk_path, store=store, fresh=True)
+        # APK 는 jadx 디컴파일 → semgrep 까지(IPA 는 pipeline 이 자동 무시). 리치 findings.
+        res = run_static(apk_path, store=store, fresh=True, decompile=True)
         meta = {"target": apk_path.name, "platform": res.platform, "sha256": res.sha256,
                 "package": next((t for t in []), "")}
         # package 추출(첫 finding 에서)

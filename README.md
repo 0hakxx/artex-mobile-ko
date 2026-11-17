@@ -70,8 +70,9 @@ docker compose -f docker/docker-compose.yml run --rm tools \
 ## 현재 상태
 
 - [x] **Phase 0** — 레포 골격 + compose(정적) + setup 스크립트
-- [~] **Phase 1** — 정적 파이프라인 동작. MobSF+apkid(APK)·MobSF+LIEF(IPA, 맥 없이)·다도구 교차 dedup 실증. semgrep/jadx는 `--decompile`/`--src`로 선택 실행. 리포트(Step 5) 남음
-  - 실행: `docker compose -f docker/docker-compose.yml run --rm tools run_static.py <apk|ipa> --fresh`
+- [x] **Phase 1** — 정적 파이프라인 완료. **MobSF·apkid·LIEF·semgrep(jadx 디컴파일)** 전부 라이브·self-contained.
+  APK/IPA 분기, 교차 도구 dedup+confidence 병합, MASTG/전자금융 리포트, 웹 UI.
+  - 실행: `docker compose -f docker/docker-compose.yml run --rm tools run_static.py <apk|ipa> --fresh --decompile`
 - [ ] Phase 2 — Android 동적
 - [ ] Phase 3 — iOS 동적
 - [ ] Phase 4 — 리포트 자동화 / 패커(백로그)
