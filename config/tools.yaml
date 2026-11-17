@@ -1,0 +1,29 @@
+# 도구 경로·엔드포인트 설정. 가변값은 .env 로, 구조·기본값은 여기.
+# 어댑터는 하드코딩 대신 이 파일 + .env 에서만 값을 읽는다 (§12).
+
+mobsf:
+  # ${VAR} 는 .env / 환경변수에서 치환된다 (schema/config.py loader).
+  url: "${MOBSF_URL:-http://localhost:8010}"
+  api_key: "${MOBSF_API_KEY}"
+  scan_poll_interval_sec: 5
+  scan_poll_timeout_sec: 900
+
+semgrep:
+  # 모바일 룰셋 (registry 또는 로컬 경로)
+  config: "p/mobsf"
+  timeout_sec: 600
+
+apkid:
+  timeout_sec: 300
+
+jadx:
+  # 이미 MCP 로 연결됨 — 경로는 폴백용
+  binary: "jadx"
+
+lief:
+  # python 라이브러리, 경로 불필요
+  enabled: true
+
+store:
+  # 정적(컨테이너)·동적(호스트)이 공유하는 마운트 경로
+  path: "store/findings.jsonl"

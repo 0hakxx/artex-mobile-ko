@@ -1,0 +1,23 @@
+# 시크릿·가변 런타임 (§12: .env 와 골든 샘플은 커밋 금지)
+.env
+.venv-dynamic/
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# findings store 런타임 산출물 (스키마는 커밋, 데이터는 제외)
+store/*.jsonl
+store/*.sqlite
+store/*.db
+
+# 골든 APK/IPA 샘플 (대용량·저작권)
+tests/samples/*.apk
+tests/samples/*.ipa
+
+# 리포트 산출물
+report/out/
+
+# 웹 UI 런타임 (업로드 바이너리·잡별 산출물) — 커밋 금지
+store/jobs/
+store/uploads/

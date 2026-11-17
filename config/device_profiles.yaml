@@ -1,0 +1,16 @@
+# 기기 식별 프로파일 (§7). 동적 어댑터는 -U 금지, 아래 target 으로 명시 타겟팅.
+# 동시 연결(Android 에뮬 + iOS 실단말)에도 안전하도록 플랫폼별 분리.
+
+frida:
+  version: "16.1.4"        # 호스트 Frida 와 반드시 일치 (동적 실패 1순위 원인)
+
+android:
+  # BlueStacks adb-over-TCP 또는 루팅 실단말. adb serial 로 타겟팅.
+  target: ""               # 예: "127.0.0.1:5555" (BlueStacks) 또는 실단말 serial
+  arch: "x86"              # 에뮬=x86, 루팅 실단말=arm64
+  bluestacks_host_port: "" # 예: "<windows-host-ip>:5555" (connect-android.sh 용)
+
+ios:
+  # 탈옥 실단말. UDID 로 타겟팅.
+  target: ""               # idevice_id 로 얻은 UDID
+  arch: "arm64"

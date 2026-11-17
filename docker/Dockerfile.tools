@@ -1,0 +1,25 @@
+# 정적 보강 도구 컨테이너 (§3, §8-4): apkid·semgrep·LIEF + 파이프라인 코드.
+# 디바이스를 안 건드리므로 컨테이너. MobSF 컨테이너와 compose 네트워크로 통신,
+# store 볼륨을 공유해 findings seam 에 적재.
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+
+# apkid(yara-python 빌드 대비) 최소 빌드 의존성
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# 파이프라인 런타임 + 정적 보강 도구. 버전 고정으로 재현성 확보.
+RUN pip install \
+      setuptools==75.1.0 \
+      requests==2.32.3 pydantic==2.9.2 PyYAML==6.0.2 \
+      fastapi==0.115.0 "uvicorn[standard]==0.30.6" python-multipart==0.0.9 \
+      lief==0.15.1 \
+      semgrep==1.90.0 \
+      apkid==2.1.5
+
+WORKDIR /work
+# 코드는 런타임 bind-mount (개발 반복). CMD 는 run_static 기본.
+ENTRYPOINT ["python"]
+CMD ["run_static.py", "--help"]

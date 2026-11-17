@@ -1,0 +1,169 @@
+# MobSF 네이티브 분류 → MASTG-TEST / MASVS 매핑 테이블 (§5, §8).
+#
+# 이 Phase 의 실질 노동량 대부분(§8 "숨은 공수"). 미매핑은 normalizer 가
+# 별도 버킷(unmapped)으로 분류하고, 여기에 점진 추가해 보완한다.
+#
+# MobSF 최신 버전은 code_analysis 항목에 metadata.masvs / metadata.owasp-mobile 를
+# 이미 포함한다. normalizer 는 (1) 이 테이블 우선, (2) 없으면 MobSF metadata 폴백,
+# (3) 둘 다 없으면 unmapped 순으로 해석한다.
+#
+# 키 = MobSF code_analysis 규칙 id (또는 매니페스트/인증서 점검 id).
+
+version: 1
+
+# --- Android code_analysis 규칙 id ---
+rules:
+  android_insecure_random:
+    mastg_ids: ["MASTG-TEST-0204"]
+    masvs_ids: ["MASVS-CRYPTO-1"]
+    category: "MASVS-CRYPTO"
+
+  android_weak_hash:
+    mastg_ids: ["MASTG-TEST-0203"]
+    masvs_ids: ["MASVS-CRYPTO-1"]
+    category: "MASVS-CRYPTO"
+
+  android_md5:
+    mastg_ids: ["MASTG-TEST-0203"]
+    masvs_ids: ["MASVS-CRYPTO-1"]
+    category: "MASVS-CRYPTO"
+
+  android_ecb_crypto:
+    mastg_ids: ["MASTG-TEST-0221"]
+    masvs_ids: ["MASVS-CRYPTO-2"]
+    category: "MASVS-CRYPTO"
+
+  android_hardcoded:
+    mastg_ids: ["MASTG-TEST-0014"]
+    masvs_ids: ["MASVS-STORAGE-1"]
+    category: "MASVS-STORAGE"
+
+  android_world_readable_writable:
+    mastg_ids: ["MASTG-TEST-0001"]
+    masvs_ids: ["MASVS-STORAGE-1"]
+    category: "MASVS-STORAGE"
+
+  android_external_storage:
+    mastg_ids: ["MASTG-TEST-0004"]
+    masvs_ids: ["MASVS-STORAGE-2"]
+    category: "MASVS-STORAGE"
+
+  android_logging:
+    mastg_ids: ["MASTG-TEST-0003"]
+    masvs_ids: ["MASVS-STORAGE-2"]
+    category: "MASVS-STORAGE"
+
+  android_sql_raw_query:
+    mastg_ids: ["MASTG-TEST-0025"]
+    masvs_ids: ["MASVS-CODE-4"]
+    category: "MASVS-CODE"
+
+  android_webview_debug:
+    mastg_ids: ["MASTG-TEST-0032"]
+    masvs_ids: ["MASVS-PLATFORM-2"]
+    category: "MASVS-PLATFORM"
+
+  android_webview_javascript:
+    mastg_ids: ["MASTG-TEST-0033"]
+    masvs_ids: ["MASVS-PLATFORM-2"]
+    category: "MASVS-PLATFORM"
+
+  android_webview_ignore_ssl:
+    mastg_ids: ["MASTG-TEST-0019"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+
+  android_insecure_ssl:
+    mastg_ids: ["MASTG-TEST-0019"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+
+  android_default_trustmanager:
+    mastg_ids: ["MASTG-TEST-0019"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+
+  android_hostname_verifier:
+    mastg_ids: ["MASTG-TEST-0020"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+
+  android_clipboard:
+    mastg_ids: ["MASTG-TEST-0011"]
+    masvs_ids: ["MASVS-PLATFORM-4"]
+    category: "MASVS-PLATFORM"
+
+  android_root_detection:
+    mastg_ids: ["MASTG-TEST-0049"]
+    masvs_ids: ["MASVS-RESILIENCE-1"]
+    category: "MASVS-RESILIENCE"
+
+  android_tapjacking:
+    mastg_ids: ["MASTG-TEST-0035"]
+    masvs_ids: ["MASVS-PLATFORM-4"]
+    category: "MASVS-PLATFORM"
+
+# --- manifest_analysis 점검 id (MobSF rule 키) ---
+manifest:
+  app_is_debuggable:
+    mastg_ids: ["MASTG-TEST-0039"]
+    masvs_ids: ["MASVS-RESILIENCE-2"]
+    category: "MASVS-RESILIENCE"
+
+  app_allowbackup:
+    mastg_ids: ["MASTG-TEST-0008"]
+    masvs_ids: ["MASVS-STORAGE-2"]
+    category: "MASVS-STORAGE"
+
+  vulnerable_os_version:
+    mastg_ids: ["MASTG-TEST-0215"]
+    masvs_ids: ["MASVS-CODE-1"]
+    category: "MASVS-CODE"
+
+  task_hijacking2:
+    mastg_ids: ["MASTG-TEST-0030"]
+    masvs_ids: ["MASVS-PLATFORM-1"]
+    category: "MASVS-PLATFORM"
+
+  task_hijacking:
+    mastg_ids: ["MASTG-TEST-0030"]
+    masvs_ids: ["MASVS-PLATFORM-1"]
+    category: "MASVS-PLATFORM"
+
+  explicitly_exported:
+    mastg_ids: ["MASTG-TEST-0030"]
+    masvs_ids: ["MASVS-PLATFORM-1"]
+    category: "MASVS-PLATFORM"
+
+  clear_text_traffic:
+    mastg_ids: ["MASTG-TEST-0022"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+
+  exported_protected_permission:
+    mastg_ids: ["MASTG-TEST-0029"]
+    masvs_ids: ["MASVS-PLATFORM-1"]
+    category: "MASVS-PLATFORM"
+
+  exported_intent_filter_exists:
+    mastg_ids: ["MASTG-TEST-0030"]
+    masvs_ids: ["MASVS-PLATFORM-1"]
+    category: "MASVS-PLATFORM"
+
+# --- certificate / network_security ---
+certificate:
+  signed_with_v1:
+    mastg_ids: ["MASTG-TEST-0038"]
+    masvs_ids: ["MASVS-CODE-2"]
+    category: "MASVS-CODE"
+
+network:
+  base_config_cleartext:
+    mastg_ids: ["MASTG-TEST-0022"]
+    masvs_ids: ["MASVS-NETWORK-1"]
+    category: "MASVS-NETWORK"
+
+  trust_user_certs:
+    mastg_ids: ["MASTG-TEST-0021"]
+    masvs_ids: ["MASVS-NETWORK-2"]
+    category: "MASVS-NETWORK"

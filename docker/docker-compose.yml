@@ -1,0 +1,71 @@
+# 정적 플레인 (§3, §8). 디바이스를 안 건드리는 도구만 컨테이너.
+# 동적 도구(adb/frida/objection/libimobiledevice)는 호스트 프로세스 — 여기 넣지 않는다.
+#
+#   docker compose -f docker/docker-compose.yml up -d
+#
+# store/ 는 호스트에 bind-mount → 동적(호스트) 플레인과 findings 를 공유하는 seam.
+
+services:
+  mobsf:
+    image: opensecurity/mobile-security-framework-mobsf:latest
+    container_name: mobile-artex-mobsf
+    ports:
+      - "${MOBSF_PORT:-8010}:8000"
+    environment:
+      # API 키 고정 (비우면 MobSF 가 랜덤 생성 → setup-static.sh 가 추출)
+      - MOBSF_API_KEY=${MOBSF_API_KEY:-}
+    volumes:
+      # 분석 산출물 영속화
+      - mobsf_data:/home/mobsf/.MobSF
+    restart: unless-stopped
+    healthcheck:
+      # 로그인 페이지 200 = 서버 기동 (API 키 유무와 무관한 liveness)
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  # 정적 보강 도구 + 파이프라인 (§8-4). 디바이스 안 건드림 → 컨테이너.
+  # MobSF 는 compose 네트워크에서 http://mobsf:8000 로 접근. store 는 bind-mount 공유.
+  tools:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.tools
+    image: mobile-artex-tools:latest
+    container_name: mobile-artex-tools
+    depends_on:
+      mobsf:
+        condition: service_healthy
+    environment:
+      - MOBSF_URL=http://mobsf:8000
+      - MOBSF_API_KEY=${MOBSF_API_KEY:-}
+    volumes:
+      # 레포 전체를 /work 에 마운트 (코드 + config + store + tests/samples)
+      - ..:/work
+    # 상주 서비스 아님 — `docker compose run --rm tools <cmd>` 로 호출.
+    profiles: ["tools"]
+
+  # 웹 UI (§15): APK/IPA 업로드 → 파이프라인 → 리포트 열람. tools 이미지 재사용.
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.tools
+    image: mobile-artex-tools:latest
+    container_name: mobile-artex-web
+    depends_on:
+      mobsf:
+        condition: service_healthy
+    environment:
+      - MOBSF_URL=http://mobsf:8000
+      - MOBSF_API_KEY=${MOBSF_API_KEY:-}
+    volumes:
+      - ..:/work
+    ports:
+      - "${WEB_PORT:-8020}:8020"
+    entrypoint: ["uvicorn"]
+    command: ["web.app:app", "--host", "0.0.0.0", "--port", "8020"]
+    restart: unless-stopped
+
+volumes:
+  mobsf_data:
